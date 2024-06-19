@@ -120,6 +120,7 @@ def shortest_path(source, target):
     source_id = person_id_for_name(source)
     target_id = person_id_for_name(target)
     visited = set()
+    paths = []
 
     initial_state = Node(source_id, None, None)
     sf = StackFrontier()
@@ -127,10 +128,13 @@ def shortest_path(source, target):
 
     while not sf.empty():
         node = sf.remove()
-
+        
+        # Now it is returning the last path, I want to return all the paths, but now 
+        # will change so it will imediatly return the first one 
         if node.state == target_id:
-            path = extract_path(node)
-
+            paths.append(extract_path(node))
+            
+        
         for movie, actor in neighbors_for_person(node.state):
             if actor not in visited and not sf.contains_state(target_id):
                 visited.add(actor)
@@ -142,7 +146,7 @@ def shortest_path(source, target):
 def extract_path(node):
     path = []
     while node.parent is not None:
-        path.append((node.state, node.action))
+        path.append((node.action, node.state))
         node = node.parent
     path.reverse()
     return path
