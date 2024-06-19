@@ -96,25 +96,26 @@ def shortest_path(source, target):
     target_id = person_id_for_name(target)
 
     visited = set()
-    paths = []
+    path = []
 
-    initial_state = Node((0, source), None, visited)
+    initial_state = Node((0, source), None, None)
     sf = StackFrontier()
     sf.add(initial_state)
     try:
         while not sf.empty():
             node = sf.remove()
             if node.state[1] == target:
-                paths.append(extract_path(node))
+                path = extract_path(node)
+                return path
         
             for movie, actor in neighbors_for_person(node.state[1]):
-                if actor not in node.action:
-                    copy_visited = copy.deepcopy(node.action)
-                    copy_visited.add(actor)
-                    copy_node = Node((movie, actor), node, copy_visited)
+                if actor not in visited and not sf.deep_contains_state(target):
+                  
+                    visited.add(actor)
+                    copy_node = Node((movie, actor), node, None)
                     sf.add(copy_node)
-        paths.sort(key=len)
-        return paths[0]
+       
+        return path
     except:
         return "Something went wrong :P"
 
