@@ -122,31 +122,28 @@ def shortest_path(source, target):
     visited = set()
     paths = []
 
-    initial_state = Node(source_id, None, None)
+    initial_state = Node((0, source_id), None, visited)
     sf = StackFrontier()
     sf.add(initial_state)
 
     while not sf.empty():
         node = sf.remove()
-        
-        # Now it is returning the last path, I want to return all the paths, but now 
-        # will change so it will imediatly return the first one 
-        if node.state == target_id:
+        if node.state[1] == target_id:
             paths.append(extract_path(node))
-            
-        
-        for movie, actor in neighbors_for_person(node.state):
-            if actor not in visited and not sf.contains_state(target_id):
-                visited.add(actor)
-                node = Node(actor, node, movie)
-                sf.add(node)
-
-    return path
+      
+        for movie, actor in neighbors_for_person(node.state[1]):
+            if actor not in node.action:
+                copy_visited = copy.deepcopy(node.action)
+                copy_visited.add(actor)
+                copy_node = Node((movie, actor), node, copy_visited)
+                sf.add(copy_node)
+    paths.sort(key=len)
+    return paths
 
 def extract_path(node):
     path = []
     while node.parent is not None:
-        path.append((node.action, node.state))
+        path.append(node.state)
         node = node.parent
     path.reverse()
     return path
@@ -193,61 +190,3 @@ def neighbors_for_person(person_id):
 if __name__ == "__main__":
     main()
 
-
-# def frontier_recursion(object, target_id, not_visited=actor_ids, already_checked=added, iterations = x):
-#     """
-#     Recursively explores the frontier until a connection to the target is found.
-#     Each recursion maintains its state of people checked.
-#     """
-#     copy_of_the_object = copy.deepcopy(object)
-#     not_visited = copy.deepcopy(not_visited)
-#     # for node in copy_of_the_object.frontier:
-#     #     # print(node.current)
-#     #     # print(node.state)
-        
-#     for node in copy_of_the_object.frontier:
-#         # print("Current - ")
-#         # print(node.current)
-#         if node.current not in already_checked and iterations > 0:
-#             # print(node.state)
-#             for state in node.state:
-#                 print("Checking - ")
-#                 print(state)
-#                 already_checked.append(node.current)
-#                 if state[1] == target_id:
-#                     print("New iteration")
-#                     print("Found - ")
-#                     print(state)
-#                     # copy_of_the_objects.state, contains already some values, I need only current
-#                     array_of_frontiers.append([copy_of_the_object, state])
-#                     iterations -= 1
-#                     break
-#     # Currently it overwrites the array_of_frontiers, so only the last one is left                
-#     for state in node.state:
-#         if not_visited != []:
-#             if state in not_visited:
-#                 next_node = Node(neighbors_for_person(state[1]), node.current, (state[0], state[1]), None)
-#                 not_visited.remove(state)
-#                 copy_of_the_object.add(next_node)
-#                 frontier_recursion(copy_of_the_object, target_id, not_visited, already_checked)
-#         else:
-#             return "Finished"
-            
-# def path_extraction(array_of_frontiers):
-#     """
-#     Extracts the paths from the list of frontiers
-#     """
-#     paths = []
-#     for object in array_of_frontiers:
-#         print("new object in array")
-#         temp_path = []
-#         for i, node in enumerate(object[0].frontier):
-#             print("New node in frontier")
-#             if i > 0:
-#                 print(node.state)
-#                 temp_path.append((node.current))
-          
-#         temp_path.append(object[1])
-#         paths.append([temp_path])
-#     paths.sort(key=len)
-#     return paths
