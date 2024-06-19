@@ -1,8 +1,7 @@
 class Node():
-    def __init__(self, state, parent, current,  action):
+    def __init__(self, state, parent, action):
         self.state = state
         self.parent = parent
-        self.current = current
         self.action = action
 
 
