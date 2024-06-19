@@ -13,17 +13,6 @@ people = {}
 # Maps movie_ids to a dictionary of: title, year, stars (a set of person_ids)
 movies = {}
 
-
-# # All the ids of actors
-# actor_ids = []
-
-# movie_ids = set()
-
-# array_of_frontiers = []
-
-# added = []
-
-
 def load_data(directory):
     """
     Load data from CSV files into memory.
@@ -61,22 +50,11 @@ def load_data(directory):
                 movies[row["movie_id"]]["stars"].add(row["person_id"])
             except KeyError:
                 pass
-# # This needs to contain movie and actor tuple
-# def populate_actor_ids(people):
-#     for person in people:
-#         for movie in people[person]["movies"]:
-#             actor_ids.append((movie, person))
-#     return
-
-# def populate_movie_ids(people):
-#     for person in people:
-#         for movie in people[person]["movies"]:
-#             movie_ids.add(movie)
 
 def main():
     if len(sys.argv) > 2:
         sys.exit("Usage: python degrees.py [directory]")
-    directory = sys.argv[1] if len(sys.argv) == 2 else "small"
+    directory = sys.argv[1] if len(sys.argv) == 2 else "large"
 
     # Load data from files into memory
     print("Loading data...")
@@ -89,10 +67,6 @@ def main():
     target = person_id_for_name(input("Name: "))
     if target is None:
         sys.exit("Person not found.")
-
-    # WIll be cheaper to create this once and then pop it as I go and just check if empty
-    # populate_actor_ids(people)
-    # populate_movie_ids(people)
     
     path = shortest_path(source, target)
 
@@ -117,28 +91,32 @@ def shortest_path(source, target):
     If no possible path, returns None.
     """
     
+    #Just for testing purposes
     source_id = person_id_for_name(source)
     target_id = person_id_for_name(target)
+
     visited = set()
     paths = []
 
-    initial_state = Node((0, source_id), None, visited)
+    initial_state = Node((0, source), None, visited)
     sf = StackFrontier()
     sf.add(initial_state)
-
-    while not sf.empty():
-        node = sf.remove()
-        if node.state[1] == target_id:
-            paths.append(extract_path(node))
-      
-        for movie, actor in neighbors_for_person(node.state[1]):
-            if actor not in node.action:
-                copy_visited = copy.deepcopy(node.action)
-                copy_visited.add(actor)
-                copy_node = Node((movie, actor), node, copy_visited)
-                sf.add(copy_node)
-    paths.sort(key=len)
-    return paths
+    try:
+        while not sf.empty():
+            node = sf.remove()
+            if node.state[1] == target:
+                paths.append(extract_path(node))
+        
+            for movie, actor in neighbors_for_person(node.state[1]):
+                if actor not in node.action:
+                    copy_visited = copy.deepcopy(node.action)
+                    copy_visited.add(actor)
+                    copy_node = Node((movie, actor), node, copy_visited)
+                    sf.add(copy_node)
+        paths.sort(key=len)
+        return paths[0]
+    except:
+        return "Something went wrong :P"
 
 def extract_path(node):
     path = []
