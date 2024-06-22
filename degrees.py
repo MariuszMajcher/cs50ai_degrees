@@ -92,8 +92,6 @@ def shortest_path(source, target):
     """
     
     #Just for testing purposes
-    source_id = person_id_for_name(source)
-    target_id = person_id_for_name(target)
 
     visited = set()
     path = []
@@ -103,19 +101,28 @@ def shortest_path(source, target):
     sf.add(initial_state)
     try:
         while not sf.empty():
-            node = sf.remove()
-            if node.state[1] == target:
-                path = extract_path(node)
-                return path
-        
-            for movie, actor in neighbors_for_person(node.state[1]):
-                if actor not in visited and not sf.deep_contains_state(target):
-                  
-                    visited.add(actor)
-                    copy_node = Node((movie, actor), node, None)
-                    sf.add(copy_node)
-       
-        return path
+            list_of_frontiers = []
+            for frontier in sf.frontier:
+                node = sf.remove()
+            
+                for movie, actor in neighbors_for_person(node.state[1]):
+                    if actor not in visited:
+                        print(movie,actor)
+                        if actor == target:
+                            print("Found")
+                            path = extract_path(node)
+                            path.append((movie,actor))
+                           
+                            return path
+                        
+                        visited.add(actor)
+                        copy_node = Node((movie, actor), node, None)
+                        list_of_frontiers.append(copy_node)
+                
+            for item in list_of_frontiers:
+                new_node = list_of_frontiers.pop()
+                sf.add(new_node)
+        return None
     except:
         return "Something went wrong :P"
 
